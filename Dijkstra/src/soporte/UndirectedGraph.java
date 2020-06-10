@@ -1,6 +1,7 @@
 package soporte;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedList;
 
 
@@ -145,11 +146,57 @@ public class UndirectedGraph<T> extends Graph<T>
     
     /**
      * 
+     * @param x
      * @return 
      */
     @Override
     public long getShortestPathValue_Dijkstra(Node<T> x){
-        return 1;
+        //Con HashMap Distancia y nodos procesados. cv y d en una misma estructura.
+        HashMap<Node<T>,Integer> cvd = new HashMap<>();
+        //Heap para el almacenamiento ordenado de los arcos.
+        Heap h = new Heap();
+        
+        //Preguntar si existe el nodo que entra por parametro en el grafo. 
+        if(vertices.contains(x)){
+            //Retornar el objeto Nodo que tiene como atributo los arcos.
+            Node<T> n0 = vertices.get(getVertexIndex(x));
+            //Por cada arco donde el nodo inicial es n0 guardar en heap.
+            for (Arc<T> arc : n0.getArcs()) {
+                //if(arc.getInit() == n0)
+                    h.add(arc);
+            }
+            cvd.put(n0,0);
+         
+            while(cvd.size() < vertices.size()){
+                if(h.isEmpty()){
+                    break;
+                }
+                Arc<T> arc = (Arc<T>) h.remove();
+                
+                if(!cvd.containsKey(arc.end)){
+                    cvd.put(arc.end, cvd.get(arc.init) + arc.weight );
+                    for (Arc<T> arc1 : arc.end.getArcs()) {
+                       if(arc1.getInit() == arc.end)
+                          h.add(arc1);
+                    }
+                }
+                if(!cvd.containsKey(arc.init)){
+                    cvd.put(arc.init, cvd.get(arc.end) + arc.weight );
+                    for (Arc<T> arc1 : arc.init.getArcs()) {
+                       if(arc1.getEnd() == arc.init)
+                          h.add(arc1);
+                    }
+                }
+        }    
+        }else{
+            System.out.println("El nodo ingresado no existe en el grafo");
+        }
+        
+        Integer sumaDistancia = 0;
+        for (Integer value : cvd.values()) {
+            sumaDistancia += value;
+        }
+        return sumaDistancia;
     }
     
  

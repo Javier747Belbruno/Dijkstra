@@ -79,11 +79,13 @@ public class DirectedGraph<T> extends Graph<T>
             }
             cvd.put(n0,0);
          
-            while(cvd.size() < vertices.size()){
-                if(h.isEmpty()){
-                    break;
-                }
+            while(true){
+                //Si me quedo sin arcos para procesar terminar ciclo.
+                if(h.isEmpty()){ 
+                    break;}
+    
                 Arc<T> arc = (Arc<T>) h.remove();
+                //Si no esta en la lista, agrego nodo.
                 if(!cvd.containsKey(arc.end)){
                     cvd.put(arc.end, cvd.get(arc.init) + arc.weight );
                     for (Arc<T> arc1 : arc.end.getArcs()) {
@@ -91,7 +93,15 @@ public class DirectedGraph<T> extends Graph<T>
                           h.add(arc1);
                     }
                 }
-        }    
+                //Si esta en la lista y el arco me mejora, reemplazar el numero.
+                if(cvd.containsKey(arc.end) &&  (cvd.get(arc.init) + arc.weight) < cvd.get(arc.end)){
+                    cvd.replace(arc.end, cvd.get(arc.init) + arc.weight );
+                    for (Arc<T> arc1 : arc.end.getArcs()) {
+                       if(arc1.getInit() == arc.end)
+                          h.add(arc1);
+                    }
+                }
+            }    
         }else{
             System.out.println("El nodo ingresado no existe en el grafo");
         }
